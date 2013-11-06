@@ -26,6 +26,20 @@ class LCDMPCDaemon( Daemon ):
 		lcd.displayLine( 2, '')
 		lcd.disableBacklight();
 
+	def connectMPD( self ):
+		connected = False
+		try_again_time = 1
+		try_again_time_max = 6
+		while not connected:
+			try:
+				mpc.connect( "localhost", 6600 )
+				connected = True
+				print("Successfully connected to mpd")
+			except:
+				print("Couldn't connect to mpd, trying again in {}s".format(try_again_time))
+				time.sleep( try_again_time )
+				try_again_time = min( try_again_time * 1.5, try_again_time_max )
+
 	def run(self):
 		# Initialize lcd and mpc
 		lcd.initialize()
@@ -33,7 +47,7 @@ class LCDMPCDaemon( Daemon ):
 		lcd.displayLine( 1, 'LCD-Daemon on')
 		lcd.displayLine( 2, '')
 		
-		mpc.connect( "localhost", 6600 )
+		self.connectMPD()
 		lcd.startScrollThread()
 
 		# Main processing loop
