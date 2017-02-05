@@ -1,0 +1,9 @@
+[Unit]
+Description=LCD Display for Music Player Daemon
+After=mpd.target
+
+[Service]
+ExecStart=/usr/bin/python /root/rpi-mpc-lcd/main.py
+
+[Install]
+WantedBy=multi-user.target
