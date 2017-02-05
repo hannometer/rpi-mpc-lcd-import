@@ -12,7 +12,8 @@ from mpd import MPDClient
 
 # Class imports
 from daemon3_class import Daemon
-from lcd_class    import ScrollingLCD
+#from lcd_class    import ScrollingLCD
+from lcd_i2c_class import ScrollingLCD
 
 lcd = ScrollingLCD()
 mpc = MPDClient()
@@ -21,10 +22,13 @@ mpc = MPDClient()
 class LCDMPCDaemon( Daemon ):
 
 	def __del__( self ):
+		print("Stopping daemon")
 		lcd.stopScrollThread()
 		lcd.displayLine( 1, 'LCD-Daemon off')
 		lcd.displayLine( 2, '')
-		lcd.disableBacklight();
+		lcd.disableBacklight()
+		time.sleep(3)
+		lcd.clear()
 
 	def connectMPD( self ):
 		connected = False
@@ -43,6 +47,7 @@ class LCDMPCDaemon( Daemon ):
 	def run(self):
 		# Initialize lcd and mpc
 		lcd.initialize()
+		lcd.disableBacklight()
 		lcd.setScrollSpeed( 5 )
 		lcd.displayLine( 1, 'LCD-Daemon on')
 		lcd.displayLine( 2, '')
