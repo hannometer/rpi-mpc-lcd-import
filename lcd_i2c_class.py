@@ -57,7 +57,7 @@ class LCD:
 			text = self.translateSpecialChars(text)
 
 		self.lcd_driver.display_string( text.ljust(self.width," "), line )
-		print( "Display: '{}'".format( text ) )
+		#print( "Display: '{}'".format( text ) )
 		
 	# Set the display width
 	def setWidth(self,width):

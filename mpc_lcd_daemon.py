@@ -4,6 +4,7 @@
 
 import os
 import sys
+import signal
 import time
 import string
 import datetime
@@ -21,6 +22,16 @@ mpc = MPDClient()
 # LCD-MPC Daemon
 class LCDMPCDaemon( Daemon ):
 
+	terminate_now = False
+
+	def __init__( self, pidfile ):
+		super(Daemon, self).__init__()
+		signal.signal( signal.SIGINT, self.exitGracefully )
+		signal.signal( signal.SIGTERM, self.exitGracefully )
+
+	def exitGracefully( self ):
+		self.terminate_now = True
+
 	def __del__( self ):
 		print("Stopping daemon")
 		lcd.stopScrollThread()
@@ -35,6 +46,8 @@ class LCDMPCDaemon( Daemon ):
 		try_again_time = 1
 		try_again_time_max = 6
 		while not connected:
+			if self.terminate_now:
+				break;
 			try:
 				mpc.connect( "localhost", 6600 )
 				connected = True
@@ -57,6 +70,8 @@ class LCDMPCDaemon( Daemon ):
 
 		# Main processing loop
 		while True:
+			if self.terminate_now:
+				break
 			songinfo = self.getCurrentSongInfo()
 			print("[isPlaying: {}] {}: {}".format(self.isPlaying(), songinfo['artist'], songinfo['title']))
 			lcd.setBacklightEnabled( self.isPlaying() )
